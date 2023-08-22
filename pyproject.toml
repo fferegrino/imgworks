@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "asset-resizer"
-version = "0.1.0"
+name = "asset-sizer"
+version = "0.2.0"
 description = ""
 authors = ["Antonio Feregrino <antonio.feregrino@gmail.com>"]
 license = "MIT"
@@ -15,7 +15,7 @@ imageio = "^2.31.1"
 ruff = "^0.0.282"
 
 [tool.poetry.scripts]
-asset-sizer = "asset_resizer.__main__:app"
+rsize = "asset_sizer.__main__:app"
 
 [tool.ruff]
 select = ["E", "F", "W", "Q", "I"]

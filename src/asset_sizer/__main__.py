@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Union
 
 import imageio.v3 as iio
 import typer
@@ -25,11 +25,23 @@ class ImageData:
 def main(
     folder: Path = typer.Argument(
         Path("."), exists=True, file_okay=False, dir_okay=True, resolve_path=True
-    )
+    ),
+    width: str  =  typer.Argument(default='min', help="Width of the resized images in pixels, or 'min' or 'max' to use the minimum or maximum width of the images in the folder")
 ):
+    """Resize images in a folder to a given width"""
     images = load_images(folder)
 
-    new_width = min([ im.image.width for im in images], key=lambda width: width)
+    print(width)
+
+    try:
+        new_width = int(width)
+    except ValueError:
+        if width == 'min':
+            new_width = min([ im.image.width for im in images], key=lambda width: width)
+        elif width == 'max':
+            new_width = max([ im.image.width for im in images], key=lambda width: width)
+        else:
+            raise typer.BadParameter(f"Invalid width: {width}")
 
     resized = resize(images, new_width)
 
