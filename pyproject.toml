@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "asset-sizer"
+name = "imgworks"
 version = "0.2.0"
 description = ""
 authors = ["Antonio Feregrino <antonio.feregrino@gmail.com>"]
@@ -15,10 +15,11 @@ imageio = "^2.31.1"
 ruff = "^0.0.282"
 
 [tool.poetry.scripts]
-rsize = "asset_sizer.__main__:app"
+imgworks = "imgworks.__main__:app"
 
 [tool.ruff]
 select = ["E", "F", "W", "Q", "I"]
+line-length = 120
 
 [build-system]
 requires = ["poetry-core"]
