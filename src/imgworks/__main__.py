@@ -5,6 +5,7 @@ from typing import List, Set
 import imageio.v3 as iio
 import typer
 from PIL import Image
+from pillow_heif import register_heif_opener
 
 ORIGINAL_IMAGE_EXTENSIONS = {
     ".png",
@@ -41,6 +42,28 @@ def convert_webp(
 
     images = load_images(folder, extensions={".webp"})
 
+    if not to_format.startswith("."):
+        to_format = "."+to_format
+
+    format = FORMATS.get(to_format, None)
+
+    for im in images:
+        im.image.save(im.path.with_suffix(to_format), format)
+
+
+@app.command()
+def convert_heic(
+    folder: Path = typer.Argument(
+        Path("."), exists=True, file_okay=False, dir_okay=True, resolve_path=True
+    ),
+    to_format: str = typer.Argument(
+        "jpg",
+        help="Format to convert to",
+        show_default=True,
+    )):
+    register_heif_opener()
+    images = load_images(folder, extensions={".heic"})
+    print(images)
     if not to_format.startswith("."):
         to_format = "."+to_format
 
@@ -104,7 +127,7 @@ def load_images(folder: Path, extensions: Set[str]) -> List[ImageData]:
     images: List[ImageData] = []
     for file in folder.iterdir():
         if file.is_file():
-            if file.suffix in extensions:
+            if file.suffix.lower() in extensions:
                 full_path = (folder / file).resolve()
                 image =  Image.fromarray(iio.imread(full_path))
                 image_data = ImageData(
