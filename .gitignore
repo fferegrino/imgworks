@@ -5,6 +5,7 @@ __pycache__/
 *$py.class
 
 .DS_Store
+.idea/
 dist/
 *.jpg
 *.gif
