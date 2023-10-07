@@ -11,44 +11,32 @@ sizes = []
 app = typer.Typer()
 
 
-@app.command()
-def convert_webp(
-    folder: Path = typer.Argument(Path("."), exists=True, file_okay=False, dir_okay=True, resolve_path=True),
-    to_format: str = typer.Argument(
-        "jpg",
-        help="Format to convert to",
-        show_default=True,
-    ),
-):
-    images = load_images(folder, extensions={".webp"})
-
-    if not to_format.startswith("."):
-        to_format = "." + to_format
-
-    format = FORMATS.get(to_format, None)
-
-    for im in images:
-        im.image.save(im.path.with_suffix(to_format), format)
+_convert_commands = [
+    ("heic", "jpg"),
+    ("heic", "png"),
+    ("webp", "jpg"),
+    ("webp", "png"),
+]
 
 
-@app.command()
-def convert_heic(
-    folder: Path = typer.Argument(Path("."), exists=True, file_okay=False, dir_okay=True, resolve_path=True),
-    to_format: str = typer.Argument(
-        "jpg",
-        help="Format to convert to",
-        show_default=True,
-    ),
-):
-    register_heif_opener()
-    images = load_images(folder, extensions={".heic"})
-    if not to_format.startswith("."):
-        to_format = "." + to_format
+for original, new in _convert_commands:
 
-    format = FORMATS.get(to_format, None)
+    @app.command(name=f"{original}2{new}", help=f"Convert images from {original} to {new}")
+    def convert(
+        folder: Path = typer.Argument(Path("."), exists=True, file_okay=False, dir_okay=True, resolve_path=True),
+        from_format: str = typer.Argument(original, help="Format to convert from", show_default=True, hidden=True),
+        to_format: str = typer.Argument(new, help="Format to convert to", show_default=True, hidden=True),
+    ):
+        if from_format == "heic":
+            register_heif_opener()
+        images = load_images(folder, extensions={f".{from_format}"})
+        if not to_format.startswith("."):
+            to_format = "." + to_format
 
-    for im in images:
-        im.image.save(im.path.with_suffix(to_format), format)
+        fmt = FORMATS.get(to_format, None)
+
+        for im in images:
+            im.image.save(im.path.with_suffix(to_format), fmt)
 
 
 @app.command()
